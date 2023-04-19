@@ -26,7 +26,7 @@ void idft( const double zr[N/2],
 	       const double zi[N/2], double m[N]){
 	for(int i=0;i<N/2;i++){
 		m[i]=0; m[i+N/2]=0;
-		for(int j=0,powerij=i; j<N/2; j++,powerij=(fiveij*5)%(2*N)){
+		for(int j=0,powerij=i; j<N/2; j++,powerij=(powerij*5)%(2*N)){
 			double c=cos(PI/N*powerij);
 			double s=sin(PI/N*powerij);
 			m[i    ]+=c*zr[j]+s*zi[j];
