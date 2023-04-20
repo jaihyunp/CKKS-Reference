@@ -98,162 +98,191 @@ void main() {
 		z2i[i] = 0;
 	}
 
+	const int ITER = 100;
 
 	/* Enc Dec */
 	printf("\nEnc & Dec Error\n");
+	long double max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
 
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
 
-	dec<N, L>(ct1, s, q, pt_out);
-	decode<N, logN, L>(pt_out, Delta, q, wr, wi);
+		dec<N, L>(ct1, s, q, pt_out);
+		decode<N, logN, L>(pt_out, Delta, q, wr, wi);
 
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - z1r[i];
-		erri[i] = 0;
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - z1r[i];
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 
 
 	/* Add */
 	printf("\nAdd error\n");
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
-	encode<N, logN, L>(z2r, z2i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct2);
+	max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
 
-	for (int k = 0; k < 2; ++k) {
-		for (int i = 0; i < L; i++) {
-			for (int j = 0; j < N; j++) {
-				ct_tmp[k][i][j] = (ct1[k][i][j] + ct2[k][i][j]) % q[i];
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
+		encode<N, logN, L>(z2r, z2i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct2);
+
+		for (int k = 0; k < 2; ++k) {
+			for (int i = 0; i < L; i++) {
+				for (int j = 0; j < N; j++) {
+					ct_tmp[k][i][j] = (ct1[k][i][j] + ct2[k][i][j]) % q[i];
+				}
 			}
 		}
+
+		dec<N, L>(ct_tmp, s, q, pt_out);
+		decode<N, logN, L>(pt_out, Delta, q, wr, wi);
+
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - (z1r[i] + z2r[i]);
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-
-	dec<N, L>(ct_tmp, s, q, pt_out);
-	decode<N, logN, L>(pt_out, Delta, q, wr, wi);
-
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - (z1r[i] + z2r[i]);
-		erri[i] = 0;
-	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
-
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 
 	/* Rescale w/ a const scaling factor */
 	printf("\nRescale (single) error\n");
 	printf("* With a constant scaling factor\n");
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
+	max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
 
-	for (int k = 0; k < 2; ++k) {
-		for (int i = 0; i < L-1; i++) {
-			for (int j = 0; j < N; j++) {
-				ct_out[k][i][j] = ct1[k][i][j];
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
+
+		for (int k = 0; k < 2; ++k) {
+			for (int i = 0; i < L-1; i++) {
+				for (int j = 0; j < N; j++) {
+					ct_out[k][i][j] = ct1[k][i][j];
+				}
 			}
 		}
-	}
 
-	Delta_out = Delta;
-	dec<N, L - 1>(ct_out, s, q, pt_out);
-	decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+		Delta_out = Delta;
+		dec<N, L - 1>(ct_out, s, q, pt_out);
+		decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
 
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - z1r[i];
-		erri[i] = 0;
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - z1r[i];
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 
 
 	/* Rescale w/ leveled scaling factors */
 	printf("\nRescale (single) error\n");
 	printf("* With leveled scaling factors\n");
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
-	for (int k = 0; k < 2; ++k) {
-		for (int i = 0; i < L; i++) {
-			for (int j = 0; j < N; j++) {
-				ct_tmp[k][i][j] = mul_mod(Delta, ct1[k][i][j], q[i]);
+	max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
+
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
+		for (int k = 0; k < 2; ++k) {
+			for (int i = 0; i < L; i++) {
+				for (int j = 0; j < N; j++) {
+					ct_tmp[k][i][j] = mul_mod(Delta, ct1[k][i][j], q[i]);
+				}
 			}
 		}
-	}
-	RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
-	Delta_out = Delta;
-	Delta_out = (uint64_t)((long double)Delta_out * ((long double)Delta_out / (long double)q[L - 1]));
-	dec<N, L - 1>(ct_out, s, q, pt_out);
-	decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+		RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
+		Delta_out = Delta;
+		Delta_out = (uint64_t)((long double)Delta_out * ((long double)Delta_out / (long double)q[L - 1]));
+		dec<N, L - 1>(ct_out, s, q, pt_out);
+		decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
 
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - z1r[i];
-		erri[i] = 0;
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - z1r[i];
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 
 
 	/* Mult w/ a const scaling factor */
 	printf("\nMult once error\n");
 	printf("* With a constant scaling factor\n");
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
-	encode<N, logN, L>(z2r, z2i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct2);
+	max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
 
-	mul<N, L, DNUM, K>(q, p, evk_hat, ct1, ct2, ct_tmp);
-	RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
+		encode<N, logN, L>(z2r, z2i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct2);
 
-
-	Delta_out = Delta;
-	dec<N, L - 1>(ct_out, s, q, pt_out);
-	decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+		mul<N, L, DNUM, K>(q, p, evk_hat, ct1, ct2, ct_tmp);
+		RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
 
 
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - z1r[i] * z2r[i];
-		erri[i] = 0;
+		Delta_out = Delta;
+		dec<N, L - 1>(ct_out, s, q, pt_out);
+		decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+
+
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - z1r[i] * z2r[i];
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 
 
 	/* Mult w/ leveled scaling factors */
 	printf("\nMult once error\n");
 	printf("* With leveled scaling factors\n");
-	encode<N, logN, L>(z1r, z1i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct1);
-	encode<N, logN, L>(z2r, z2i, Delta, q, pt);
-	enc<N, L>(pt, s, q, ct2);
+	max_err = 0;
+	for (int iter = 0; iter < ITER; iter++) {
 
-	mul<N, L, DNUM, K>(q, p, evk_hat, ct1, ct2, ct_tmp);
-	RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
+		encode<N, logN, L>(z1r, z1i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct1);
+		encode<N, logN, L>(z2r, z2i, Delta, q, pt);
+		enc<N, L>(pt, s, q, ct2);
 
-
-	Delta_out = Delta;
-	Delta_out = (uint64_t)((long double)Delta_out * ((long double)Delta_out / (long double)q[L - 1]));
-	dec<N, L - 1>(ct_out, s, q, pt_out);
-	decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+		mul<N, L, DNUM, K>(q, p, evk_hat, ct1, ct2, ct_tmp);
+		RS_hat<N, L, L - 1>(q, ct_tmp, ct_out);
 
 
-	for (int i = 0; i < N / 2; i++) {
-		errr[i] = wr[i] - z1r[i] * z2r[i];
-		erri[i] = 0;
+		Delta_out = Delta;
+		Delta_out = (uint64_t)((long double)Delta_out * ((long double)Delta_out / (long double)q[L - 1]));
+		dec<N, L - 1>(ct_out, s, q, pt_out);
+		decode<N, logN, L - 1>(pt_out, Delta_out, q, wr, wi);
+
+
+		for (int i = 0; i < N / 2; i++) {
+			errr[i] = wr[i] - z1r[i] * z2r[i];
+			erri[i] = 0;
+		}
+		long double err = std::log2l(norm_max(errr, erri));
+		if (err < max_err)
+			max_err = err;
 	}
-	printf("error in Linf norm: %lf\n", -std::log2l(norm_max(errr, erri)));
-	printf("error in L2 norm: %lf\n", -std::log2l(sqrt(norm_square(errr, erri))));
-	printf("error in L2_exp norm: %lf\n", -std::log2l(norm_square_exp(errr, erri)));
+	printf("maximal error in Linf norm: %lf\n", max_err);
 
 }
 
