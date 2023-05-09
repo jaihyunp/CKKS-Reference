@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "64-bit Prime", "64-bit Prim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "32-bit Prime", "32-bit Prime\32-bit Prime.vcxproj", "{BF1214BC-CF5F-430B-976D-7354910B9239}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "32-bit Precision", "32-bit Precision\32-bit Precision.vcxproj", "{EE1E8223-45E4-4BE7-810D-B0454C076CF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -40,6 +42,14 @@ Global
 		{BF1214BC-CF5F-430B-976D-7354910B9239}.Release|x64.Build.0 = Release|x64
 		{BF1214BC-CF5F-430B-976D-7354910B9239}.Release|x86.ActiveCfg = Release|Win32
 		{BF1214BC-CF5F-430B-976D-7354910B9239}.Release|x86.Build.0 = Release|Win32
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Debug|x64.ActiveCfg = Debug|x64
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Debug|x64.Build.0 = Debug|x64
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Debug|x86.ActiveCfg = Debug|Win32
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Debug|x86.Build.0 = Debug|Win32
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Release|x64.ActiveCfg = Release|x64
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Release|x64.Build.0 = Release|x64
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Release|x86.ActiveCfg = Release|Win32
+		{EE1E8223-45E4-4BE7-810D-B0454C076CF6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
