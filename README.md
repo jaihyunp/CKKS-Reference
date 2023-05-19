@@ -32,7 +32,7 @@ There are four projects in the solution file CKKS_RNS.sln.
 
 ### Develop Environment
 
-- Visual Studio @17.5.3
+- Visual Studio C++ 2022 @17.5.3
 
 - Windows 10
 
