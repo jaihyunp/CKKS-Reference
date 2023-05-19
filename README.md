@@ -12,7 +12,7 @@ You can build and compile the script using Microsoft Visual Studio. You can open
 
 ### Projects
 
-There are four projects in the solution file CKKS_RNS.sln. 
+There are four projects in the solution file CKKS_RNS.sln. You can select the project in 'Solution Property Pages' (Project > Properties).
 
 - "CKKS_all combined" project
   
